@@ -29,7 +29,8 @@ const corsOptions = {
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:64425",
-    "http://127.0.0.1:53554"
+    "http://127.0.0.1:53554",
+    "https://dream-hire-job-portal.vercel.app"
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
