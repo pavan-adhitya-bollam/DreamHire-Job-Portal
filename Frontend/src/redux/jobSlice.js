@@ -10,7 +10,7 @@ const initialState = {
 };
 
 const jobSlice = createSlice({
-  name: "jobs",
+  name: "job",
   initialState,
   reducers: {
     setAllJobs(state, action) {

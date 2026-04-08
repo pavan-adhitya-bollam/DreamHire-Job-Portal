@@ -12,7 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { MoreHorizontal } from "lucide-react";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
-import axios from "axios";
+import api from "@/utils/axios";
 import { APPLICATION_API_ENDPOINT } from "@/utils/data";
 
 const shortlistingStatus = ["Accepted", "Rejected"];
@@ -23,11 +23,7 @@ const ApplicantsTable = () => {
   const statusHandler = async (status, id) => {
     console.log("called");
     try {
-      axios.defaults.withCredentials = true;
-      const res = await axios.post(
-        `${APPLICATION_API_ENDPOINT}/status/${id}/update`,
-        { status }
-      );
+      const res = await api.post(`/application/status/${id}/update`, { status });
       console.log(res);
       if (res.data.success) {
         toast.success(res.data.message);

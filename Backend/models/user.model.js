@@ -35,6 +35,16 @@ const userSchema = new mongoose.Schema(
       default: "Student",
       required: true,
     },
+    emailVerificationOTP: {
+      type: String,
+    },
+    emailVerificationExpires: {
+      type: Date,
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
     profile: {
       bio: {
         type: String,

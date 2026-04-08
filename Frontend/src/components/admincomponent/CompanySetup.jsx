@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components_lite/Navbar.jsx";
-import { Button } from "../ui/button.jsx";
+import Navbar from "../components_lite/Navbar";
+import { Button } from "../ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { Label } from "../ui/label.jsx";
-import { Input } from "../ui/input.jsx";
-import axios from "axios";
-import { COMPANY_API_ENDPOINT } from "../../utils/data.js";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import api from "@/utils/axios";
+import { COMPANY_API_ENDPOINT } from "@/utils/data";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
@@ -47,16 +47,11 @@ const CompanySetup = () => {
     }
     try {
       setLoading(true);
-      const res = await axios.put(
-        `${COMPANY_API_ENDPOINT}/update/${params.id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          withCredentials: true,
-        }
-      );
+      const res = await api.put(`/company/update/${params.id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       console.log(res); // Debugging API response
 
       // Assuming a successful response has a `message` property

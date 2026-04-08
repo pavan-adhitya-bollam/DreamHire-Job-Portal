@@ -1,0 +1,8 @@
+<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <rect width="48" height="48" rx="6" fill="#FF0000"/>
+  <g transform="translate(8, 8)">
+    <path d="M0 0 L32 32 L0 32 Z" fill="white"/>
+    <path d="M32 0 L0 32 L32 32 Z" fill="#FF0000" opacity="0.4"/>
+  </g>
+  <text x="24" y="42" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="5" font-weight="bold">Adobe</text>
+</svg>

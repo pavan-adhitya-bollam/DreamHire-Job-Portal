@@ -4,57 +4,137 @@ import { Button } from "../ui/button";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import { Bookmark } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { addToMyList, removeFromMyList } from "@/redux/myListSlice";
+import { toast } from "sonner";
+
+import { FaMapMarkerAlt } from "react-icons/fa";
+import { MdWork } from "react-icons/md";
+import { FaMoneyBillWave } from "react-icons/fa";
+
+import { getCompanyImage } from "../../assets/companyImages";
 
 const Job1 = ({ job }) => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { savedJobs } = useSelector((store) => store.myList);
 
-  const daysAgoFunction = (mongodbTime) => {
-    const createdAt = new Date(mongodbTime);
-    const currentTime = new Date();
-    const timeDifference = currentTime - createdAt;
-    return Math.floor(timeDifference / (1000 * 24 * 60 * 60));
+  // CONSISTENT RANDOM DAYS BASED ON JOB ID (same as Description component)
+  // ✅ CONSISTENT RANDOM DAYS BASED ON JOB ID (same as Description component)
+  const jobIdNum = parseInt(job?._id) || 1;
+  const daysAgo = (jobIdNum * 7) % 30 + 1; // 1-30 days
+
+  // ✅ CHECK IF JOB IS ALREADY SAVED
+  const isSaved = savedJobs.some(savedJob => savedJob._id === job._id);
+
+  // ✅ BOOKMARK CLICK HANDLER
+  const handleBookmarkClick = () => {
+    // Single click toggle save/unsave
+    if (isSaved) {
+      dispatch(removeFromMyList(job._id));
+      toast("Removed from MyList");
+    } else {
+      dispatch(addToMyList(job));
+      toast("Added to MyList!");
+    }
+  };
+
+  const handleSave = () => {
+    if (isSaved) {
+      dispatch(removeFromMyList(job._id));
+      toast("Removed from MyList");
+    } else {
+      dispatch(addToMyList(job));
+      toast("Added to MyList!");
+    }
   };
 
   return (
-    <div className="p-5 rounded-md shadow-xl bg-white border border-gray-100">
+    <div className="p-5 rounded-xl bg-white shadow-md hover:shadow-2xl transition duration-300 border hover:border-blue-400 hover:scale-105 cursor-pointer">
+      
+      {/* TOP SECTION */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-500">
-          {daysAgoFunction(job?.createdAt) === 0
-            ? "Today"
-            : `${daysAgoFunction(job?.createdAt)} days ago`}
+          {daysAgo === 1 ? "1 day ago" : `${daysAgo} days ago`}
         </p>
-        <Button variant="outline" className="rounded-full" size="icon">
-          <Bookmark />
+
+        <Button 
+          variant="outline" 
+          className={`rounded-full transition-colors duration-300 ${
+            isSaved ? "bg-blue-500 border-blue-500 text-white" : "border-input bg-background"
+          }`}
+          size="icon"
+          onClick={handleBookmarkClick}
+        >
+          <Bookmark className={isSaved ? "text-white" : ""} />
         </Button>
       </div>
 
+      {/* COMPANY */}
       <div className="flex items-center gap-2 my-2">
         <Button className="p-6" variant="outline" size="icon">
-          <Avatar>
-            <AvatarImage src={job?.company?.logo} />
+          <Avatar className="w-12 h-12">
+            <AvatarImage 
+              src={getCompanyImage(job?.company?.name)} 
+              className="object-contain p-1"
+              onError={(e) => {
+                // If local logo fails, try to use any provided logo
+                if (job?.company?.logo) {
+                  e.target.src = job?.company?.logo;
+                } else {
+                  e.target.style.display = 'none';
+                }
+              }}
+            />
           </Avatar>
         </Button>
         <div>
-          <h1 className="font-medium text-lg">{job?.company?.name}</h1>
+          <h1 className="font-medium text-lg">
+            {job?.company?.name || "Company"}
+          </h1>
           <p className="text-sm text-gray-500">India</p>
         </div>
       </div>
 
+      {/* JOB DETAILS */}
       <div>
-        <h1 className="font-bold text-lg my-2">{job?.title}</h1>
-        <p className="text-sm text-gray-600">{job?.description}</p>
+        <div className="flex items-center gap-2 my-2">
+          <h1 className="font-bold text-lg text-gray-800">{job?.title}</h1>
+          {job?.jobType === "Internship" && (
+            <Badge className="bg-green-100 text-green-800 text-xs px-2 py-1">
+              Internship
+            </Badge>
+          )}
+        </div>
       </div>
-      <div className="flex items-center gap-2 mt-4">
-        <Badge className={"text-blue-700 font-bold"} variant="ghost">
-          {job?.position} Positions
-        </Badge>
-        <Badge className={"text-[#F83002] font-bold"} variant="ghost">
-          {job?.jobType}
-        </Badge>
-        <Badge className={"text-[#7209b7] font-bold"} variant="ghost">
-          {job?.salary}LPA
-        </Badge>
+
+      {/* JOB INFO WITH ICONS */}
+      <div className="flex flex-col gap-2 mt-4 text-sm text-gray-600">
+
+        <p className="flex items-center gap-2">
+          <FaMapMarkerAlt className="text-red-500" />
+          {job?.location || "India"}
+        </p>
+
+        <p className="flex items-center gap-2">
+          <MdWork className="text-blue-500" />
+          {job?.position || 1} {job?.position === 1 ? "Position" : "Positions"} • {job?.jobType || "Full Time"}
+          {job?.duration && ` • ${job.duration}`}
+        </p>
+
+        <p className="flex items-center gap-2">
+          <span className="text-blue-600 font-medium">⏱</span>
+          {job?.experience || "Experience not specified"}
+        </p>
+
+        <p className="flex items-center gap-2">
+          <FaMoneyBillWave className="text-green-500" />
+          {job?.salary} LPA
+        </p>
+
       </div>
+
+      {/* BUTTONS */}
       <div className="flex items-center gap-4 mt-4">
         <Button
           onClick={() => navigate(`/description/${job?._id}`)}
@@ -62,131 +142,18 @@ const Job1 = ({ job }) => {
         >
           Details
         </Button>
-        <Button className="bg-[#7209b7]">Save For Later</Button>
+
+        <Button
+          onClick={handleSave}
+          className={`${
+            isSaved ? "bg-gray-500" : "bg-[#7209b7]"
+          } text-white`}
+        >
+          {isSaved ? "Saved" : "Save For Later"}
+        </Button>
       </div>
     </div>
   );
 };
 
 export default Job1;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React from "react";
-// import { Button } from "../ui/button";
-// import { Bookmark, BookMarked } from "lucide-react";
-// import { Avatar, AvatarImage } from "../ui/avatar";
-// import { Badge } from "../ui/badge";
-// import { useNavigate } from "react-router-dom";
-
-// const Job1 = ({ job }) => {
-//   // Destructure properties from the job object.
-//   const {
-//     company,
-//     title,
-//     description,
-//     position,
-//     salary,
-//     location,
-//     jobType,
-//     _id,
-//   } = job;
-
-//   // For bookmarking feature
-//   const [isBookmarked, setIsBookmarked] = React.useState(false);
-
-//   // Navigation hook
-//   const navigate = useNavigate();
-//   const daysAgo = (mongodbTime) => {
-//     const createdAt = new Date(mongodbTime);
-//     const currentTime = new Date();
-//     const timeDiff = currentTime - createdAt;
-//     return Math.floor(timeDiff / (1000 * 24 * 60 * 60));
-//   };
-
-//   return (
-//     <div className="p-5 rounded-md shadow-xl bg-white border border-gray-200 cursor-pointer hover:shadow-2xl hover:shadow-blue-200 hover:p-3">
-//       {/* Job time and bookmark button */}
-//       <div className="flex items-center justify-between">
-//         <p className="text-sm text-gray-600">
-//           {daysAgo(job?.createdAt) === 0
-//             ? "Today"
-//             : `${daysAgo(job?.createdAt)} days ago`}
-//         </p>
-//         <Button
-//           variant="outline"
-//           className="rounded-full"
-//           size="icon"
-//           onClick={() => setIsBookmarked(!isBookmarked)}
-//         >
-//           {isBookmarked ? <BookMarked /> : <Bookmark />}
-//         </Button>
-//       </div>
-
-//       {/* Company info and avatar */}
-//       <div className="flex items-center gap-2 my-2">
-//         <Button className="p-6" variant="outline" size="icon">
-//           <Avatar>
-//             <AvatarImage
-//               src={job?.company?.logo}
-//             />
-//           </Avatar>
-//         </Button>
-//         <div>
-//           <h1 className="text-lg font-medium">{job?.company?.name}</h1>
-//           <p className="text-sm text-gray-600">India</p>
-//         </div>
-//       </div>
-
-//       {/* Job title, description, and job details */}
-//       <div>
-//         <h2 className="font-bold text-lg my-2">{title}</h2>
-//         <p className="text-sm text-gray-600">{description}</p>
-//         <div className="flex gap-2 items-center mt-4">
-//           <Badge className="text-blue-600 font-bold" variant="ghost">
-//             {position} Open Positions
-//           </Badge>
-//           <Badge className="text-[#FA4F09] font-bold" variant="ghost">
-//             {salary} LPA
-//           </Badge>
-//           <Badge className="text-[#6B3AC2] font-bold" variant="ghost">
-//             {location}
-//           </Badge>
-//           <Badge className="text-black font-bold" variant="ghost">
-//             {jobType}
-//           </Badge>
-//         </div>
-//       </div>
-
-//       {/* Actions: Details and Save for Later */}
-//       <div className="flex items-center gap-4 mt-4">
-//         <Button
-//           onClick={() => navigate(`/description/${_id}`)}
-//           variant="outline"
-//           className="font-bold rounded-sm"
-//         >
-//           Details
-//         </Button>
-//         <Button
-//           variant="outline"
-//           className="bg-[#6B3AC2] text-white font-bold rounded-sm"
-//         >
-//           Save For Later
-//         </Button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Job1;

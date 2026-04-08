@@ -1,16 +1,23 @@
 import mongoose from "mongoose";
+
 const applicationSchema = new mongoose.Schema(
   {
     job: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Job",
+      type: String,
       required: true,
     },
+
     applicant: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      type: String,
       required: true,
     },
+
+    // ✅ ADD THIS (VERY IMPORTANT)
+    resume: {
+      type: String,
+      required: true,
+    },
+
     status: {
       type: String,
       enum: ["pending", "accepted", "rejected"],

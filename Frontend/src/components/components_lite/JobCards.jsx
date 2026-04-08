@@ -1,41 +1,77 @@
 import React from "react";
-import { Badge } from "../ui/badge";
 import { useNavigate } from "react-router-dom";
+import { FaMapMarkerAlt } from "react-icons/fa";
+import { MdWork } from "react-icons/md";
+import { FaMoneyBillWave } from "react-icons/fa";
 
-
-const JobCards = ({job}) => {
-  console.log(job);
+const JobCards = ({ job }) => {
   const navigate = useNavigate();
- 
-  return (
-    <div onClick={()=>navigate(`/description/${job._id}`)} className="p-5 rounded-md shadow-xl bg-white  border border-gray-200 cursor-pointer hover:shadow-2xl hover:shadow-blue-200 hover:p-3 ">
-      <div>
 
-        <h1 className="text-lg font-medium"> {job.name} </h1>
-       
-        <p className="text-sm text-gray-600">India</p>
-      </div>
-      <div>
-        <h2 className="font-bold text-lg my-2">{job.title}</h2>
-        <p className="text-sm text-gray-600">
-          {
-            job.description
-          }
+  // ✅ CONSISTENT RANDOM DAYS BASED ON JOB ID (same as Job1 and Description components)
+  const jobIdNum = parseInt(job?._id) || 1;
+  const daysAgo = (jobIdNum * 7) % 30 + 1; // 1-30 days
+
+  return (
+    <div
+      onClick={() => navigate(`/description/${job._id}`)}
+      className="p-5 rounded-xl bg-white shadow-md hover:shadow-2xl transition duration-300 border hover:border-blue-400 hover:scale-105 cursor-pointer"
+    >
+      {/* TOP SECTION */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          {job.company?.logo && (
+            <img 
+              src={job.company.logo} 
+              alt={job.company.name}
+              className="w-12 h-12 object-contain rounded"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          )}
+          <div>
+            <h1 className="text-lg font-medium">
+              {job.company?.name || "Company"}
+            </h1>
+            <p className="text-sm text-gray-500">India</p>
+          </div>
+        </div>
+
+        <p className="text-sm text-gray-500">
+          {daysAgo === 1 ? "1 day ago" : `${daysAgo} days ago`}
         </p>
       </div>
-      <div className=" flex gap-2 items-center mt-4 ">
-        <Badge className={" text-blue-600 font-bold"} variant={"ghost"}>
-          {job.position} Open Positions
-        </Badge>
-        <Badge className={" text-[#FA4F09] font-bold"} variant={"ghost"}>
-          {job.salary}LPA
-        </Badge>
-        <Badge className={" text-[#6B3AC2]  font-bold"} variant={"ghost"}>
-          {job.location}
-        </Badge>
-        <Badge className={" text-black font-bold"} variant={"ghost"}>
-          {job.jobType}
-        </Badge>
+
+      {/* JOB DETAILS */}
+      <div>
+        <h2 className="font-bold text-lg my-2 text-gray-800">
+          {job.title}
+        </h2>
+      </div>
+
+      {/* ICON STYLE (MATCHES Job1.jsx) */}
+      <div className="flex flex-col gap-2 mt-4 text-sm text-gray-600">
+
+        <p className="flex items-center gap-2">
+          <FaMapMarkerAlt className="text-red-500" />
+          {job?.location || "India"}
+        </p>
+
+        <p className="flex items-center gap-2">
+          <MdWork className="text-blue-500" />
+          {job?.position || 1} Positions • {job?.jobType || "Full Time"}
+        </p>
+
+        <p className="flex items-center gap-2">
+          <span className="text-blue-600 font-medium">⏱</span>
+          {job?.experience || "Experience not specified"}
+        </p>
+
+        <p className="flex items-center gap-2">
+          <FaMoneyBillWave className="text-green-500" />
+          {job?.salary} LPA
+        </p>
+
       </div>
     </div>
   );

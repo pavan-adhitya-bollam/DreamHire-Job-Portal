@@ -1,6 +1,6 @@
 import { setAllJobs } from "@/redux/jobSlice";
 import { JOB_API_ENDPOINT } from "@/utils/data";
-import axios from "axios";
+import api from "@/utils/axios";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -11,16 +11,17 @@ const useGetAllJobs = () => {
   const { searchedQuery } = useSelector((store) => store.job);
 
   useEffect(() => {
+    console.log("useGetAllJobs triggered with searchedQuery:", searchedQuery);
     const fetchAllJobs = async () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get(
-          `${JOB_API_ENDPOINT}/get?keyword=${searchedQuery}`,
-          {
-            withCredentials: true,
-          }
-        );
+        // Capture the searchedQuery at this moment to avoid timing issues
+        const currentQuery = searchedQuery;
+        const url = `${JOB_API_ENDPOINT}/get?keyword=${encodeURIComponent(currentQuery)}`;
+        console.log("Calling API URL:", url);
+        console.log("Using currentQuery:", currentQuery);
+        const res = await api.get(`/job/get?keyword=${encodeURIComponent(currentQuery)}`);
         console.log("API Response:", res.data);
         if (res.data.status) {
           // Updated success check
@@ -37,7 +38,7 @@ const useGetAllJobs = () => {
     };
 
     fetchAllJobs();
-  }, [dispatch]);
+  }, [dispatch, searchedQuery]);
 
   return { loading, error };
 };

@@ -1,0 +1,12 @@
+<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <rect width="48" height="48" rx="6" fill="white"/>
+  <defs>
+    <linearGradient id="tcsGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF6B35"/>
+      <stop offset="50%" stop-color="#F7931E"/>
+      <stop offset="100%" stop-color="#FF1744"/>
+    </linearGradient>
+  </defs>
+  <text x="8" y="28" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="url(#tcsGradient)">tcs</text>
+  <text x="8" y="38" font-family="Arial, sans-serif" font-size="4" fill="#0066B3">TATA CONSULTANCY SERVICES</text>
+</svg>

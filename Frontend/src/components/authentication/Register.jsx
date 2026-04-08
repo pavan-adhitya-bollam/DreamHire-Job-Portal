@@ -4,11 +4,11 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { RadioGroup } from "../ui/radio-group";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { USER_API_ENDPOINT } from "@/utils/data";
+import api from "@/utils/axios";
+import { USER_API_ENDPOINT, AUTH_API_ENDPOINT } from "@/utils/data";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoading } from "@/redux/authSlice";
+import { setLoading, setUser } from "@/redux/authSlice";
 
 const Register = () => {
   const [input, setInput] = useState({
@@ -21,21 +21,90 @@ const Register = () => {
     adharcard: "",
     file: "",
   });
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
 
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
   const { loading } = useSelector((store) => store.auth);
+
+  // Cooldown timer effect
+  useEffect(() => {
+    if (cooldown > 0) {
+      const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldown]);
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
   const ChangeFilehandler = (e) => {
-    setInput({ ...input, file: e.target.files?.[0] });
+    setInput({ ...input, file: e.target.files[0] });
+  };
+
+  const sendOTPHandler = async () => {
+    if (!input.email) {
+      toast.error("Please enter your email address first");
+      return;
+    }
+
+    try {
+      const res = await api.post(`/user/send-otp`, { email: input.email });
+      
+      if (res.data.success) {
+        setOtpSent(true);
+        setCooldown(30); // Set 30 second cooldown
+        toast.success(res.data.message);
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to send OTP");
+    }
+  };
+
+  const resendOTPHandler = async () => {
+    if (cooldown > 0) {
+      toast.error(`Please wait ${cooldown} seconds before resending OTP`);
+      return;
+    }
+    
+    await sendOTPHandler();
+  };
+
+  const verifyOTPHandler = async () => {
+    if (!otp) {
+      toast.error("Please enter the OTP");
+      return;
+    }
+
+    try {
+      const res = await api.post(`/user/verify-otp`, { email: input.email, otp });
+      
+      if (res.data.success) {
+        toast.success(res.data.message);
+        setIsVerifying(true);
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to verify OTP");
+    }
   };
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    
+    if (!isVerifying) {
+      toast.error("Please verify your email first by entering the OTP");
+      return;
+    }
+    
+    console.log("FILE:", input.file);
     const formData = new FormData();
     formData.append("fullname", input.fullname);
     formData.append("email", input.email);
@@ -49,12 +118,15 @@ const Register = () => {
     }
     try {
       dispatch(setLoading(true));
-      const res = await axios.post(`${USER_API_ENDPOINT}/register`, formData, {
+      const res = await api.post(`/user/complete-registration`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true,
       });
       if (res.data.success) {
-        navigate("/login");
+        // Set user in Redux store for automatic login
+        if (res.data.user) {
+          dispatch(setUser(res.data.user));
+        }
+        navigate("/");
         toast.success(res.data.message);
       }
     } catch (error) {
@@ -96,14 +168,55 @@ const Register = () => {
             ></Input>
           </div>
           <div className="my-2">
-            <Label>Email</Label>
-            <Input
-              type="email"
-              value={input.email}
-              name="email"
-              onChange={changeEventHandler}
-              placeholder="johndoe@gmail.com"
-            ></Input>
+            <Label>Email & Verification</Label>
+            <div className="flex space-x-2">
+              <div className="flex-1">
+                <Input
+                  type="email"
+                  value={input.email}
+                  name="email"
+                  onChange={changeEventHandler}
+                  placeholder="johndoe@gmail.com"
+                  disabled={isVerifying}
+                />
+              </div>
+              <div className="flex-1 flex space-x-1">
+                <Input
+                  type="text"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder="6-digit OTP"
+                  maxLength={6}
+                  disabled={!otpSent || isVerifying}
+                  className="text-center font-mono"
+                />
+                {!otpSent && (
+                  <button
+                    type="button"
+                    onClick={sendOTPHandler}
+                    disabled={!input.email}
+                    className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 text-sm"
+                  >
+                    Send OTP
+                  </button>
+                )}
+                {otpSent && !isVerifying && (
+                  <button
+                    type="button"
+                    onClick={verifyOTPHandler}
+                    disabled={!otp}
+                    className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 text-sm"
+                  >
+                    Verify
+                  </button>
+                )}
+                {isVerifying && (
+                  <div className="px-3 py-1 bg-green-500 text-white rounded-md text-sm flex items-center">
+                    ✓ Verified
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           <div className="my-2">
             <Label>Password</Label>
@@ -190,8 +303,9 @@ const Register = () => {
             <button
               type="submit"
               className="block w-full py-3 my-3 text-white bg-primary hover:bg-primary/90 rounded-md"
+              disabled={!isVerifying}
             >
-              Register
+              {isVerifying ? "Complete Registration" : "Verify Email First"}
             </button>
           )}
 

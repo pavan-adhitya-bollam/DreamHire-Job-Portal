@@ -1,9 +1,12 @@
 import React from "react";
 import JobCards from "./JobCards";
 import { useSelector } from "react-redux";
+import { Button } from "../ui/button";
+import { useNavigate } from "react-router-dom";
 
 const LatestJobs = () => {
-  const allJobs = useSelector((state) => state.jobs?.allJobs || []); // Safely access allJobs
+  const allJobs = useSelector((state) => state.job?.allJobs || []); // Safely access allJobs
+  const navigate = useNavigate();
 
   return (
     <div className="max-w-7xl mx-auto my-20">
@@ -27,6 +30,18 @@ const LatestJobs = () => {
             )
         )}
       </div>
+
+      {/* Show More Button */}
+      {allJobs.length > 6 && (
+        <div className="text-center mt-8">
+          <Button
+            onClick={() => navigate("/Browse")}
+            className="bg-[#6A38C2] hover:bg-[#5A2FB0] text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-200"
+          >
+            Show More Jobs →
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

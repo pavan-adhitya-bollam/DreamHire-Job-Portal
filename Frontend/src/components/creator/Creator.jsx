@@ -1,61 +1,92 @@
 import React from 'react'
 import Navbar from '../components_lite/Navbar'
-import amreshsir from './amreshsir.jpg'; // Import the local image
-import ankit from './Ankit.jpg';
-import ritik from './ritik.jpg';
-import gaurav from './gaurav.jpg';
 
 const Creator = () => {
   return (
-    <div>
+    <div className="min-h-screen bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
+      
       <Navbar />
-      <div className="flex flex-col items-center justify-center h-screen max-w-7xl mx-auto p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center w-full">
-          {/* Image Section */}
-          <div className="flex justify-center">
-            <img src={amreshsir} alt="Amresh Sir" className="h-80 object-cover rounded-lg shadow-md" />
-          </div>
-          {/* Text Section */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Dr. Amresh Kumar</h2>
-            <p className="text-gray-600 mb-2">Dr. Amresh Kumar completed his <strong>B.Tech in Electronics and Communication Engineering (ECE)</strong> from <strong>Shivnand Singh Institution of Technology and Management, Aligarh</strong>, in <strong>2002</strong>.</p>
-            <p className="text-gray-600 mb-2">After graduation, he joined <strong>Koderma Mines Institution</strong> as a <strong>part-time lecturer</strong>. He then pursued his <strong>M.Tech in Electrical Engineering</strong> from <strong>BIT Sindri, Dhanbad</strong>.</p>
-            <p className="text-gray-600 mb-2">He was later selected as an <strong>Assistant Professor</strong> in the <strong>Electronics and Communication Engineering (ECE) Department</strong> at <strong>MIT Muzaffarpur</strong>. During his tenure there, he also completed his <strong>Ph.D. in Electrical Engineering</strong> from <strong>Bihar University, Muzaffarpur, in 2016</strong>.</p>
-            <p className="text-gray-600">Following his Ph.D., he was transferred to <strong>Rashtrakavi Ramdhari Singh Dinkar College of Engineering (RRSDCE)</strong> as an <strong>Assistant Professor in the Electrical and Electronics Engineering (EEE) Department</strong>, where he continues to serve till date.</p>
-          </div>
+
+      <div className="max-w-7xl mx-auto p-6 my-10">
+
+        {/* TITLE */}
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
+          🚀 About This Project
+        </h1>
+
+        {/* MAIN CARD */}
+        <div className="bg-white p-8 rounded-xl shadow-lg border hover:shadow-xl transition">
+
+          <h2 className="text-2xl font-semibold text-purple-700 mb-4">
+            Job Portal System
+          </h2>
+
+          <p className="text-gray-600 mb-4">
+            This is a full-stack Job Portal web application developed using the MERN stack. 
+            It allows users to search for jobs, apply with resumes, and manage their applications efficiently.
+          </p>
+
+          <p className="text-gray-600 mb-4">
+            The platform provides two types of users: <strong>Students</strong> and <strong>Recruiters</strong>. 
+            Students can browse jobs, apply, and track applications, while recruiters can post jobs and manage applicants.
+          </p>
+
         </div>
-      </div>
-      
-      <hr className="w-full border-gray-300 my-6" />
-      
-      <div className="text-center p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Developers and Designers</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Developer 1 - Ankit Pathak */}
-          <a href="https://ankitpathak.vercel.app/" target="_blank" rel="noopener noreferrer" className="block text-center">
-            <img src={ankit} alt="Ankit Pathak" className="mx-auto rounded-lg shadow-md" />
-            <h3 className="text-lg font-semibold text-gray-700 mt-2">Ankit Pathak</h3>
-            <p className="text-gray-600 text-sm">Registration No: 21110125035</p>
-            <p className="text-gray-600 text-sm">Full Stack Developer</p>
-          </a>
-          {/* Developer 2 - Ritik Shrivastava */}
-          <a href="#" className="block text-center">
-            <img src={ritik} alt="Ritik Shrivastava" className="mx-auto rounded-lg shadow-md" />
-            <h3 className="text-lg font-semibold text-gray-700 mt-2">Ritik Shrivastava</h3>
-            <p className="text-gray-600 text-sm">Registration No: 21110125043</p>
-            <p className="text-gray-600 text-sm">UI/UX Designer</p>
-          </a>
-          {/* Developer 3 - Gaurav Kumar */}
-          <a href="#" className="block text-center">
-            <img src={gaurav} alt="Gaurav Kumar" className="mx-auto rounded-lg shadow-md" />
-            <h3 className="text-lg font-semibold text-gray-700 mt-2">Gaurav Kumar</h3>
-            <p className="text-gray-600 text-sm">Registration No: 21110125023</p>
-            <p className="text-gray-600 text-sm">Research</p>
-          </a>
+
+        {/* FEATURES */}
+        <div className="bg-white p-8 rounded-xl shadow-lg border mt-6 hover:shadow-xl transition">
+
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            ✨ Key Features
+          </h2>
+
+          <ul className="list-disc pl-5 text-gray-600 space-y-2">
+            <li>🔍 Job Search with filters (location, technology, salary, experience)</li>
+            <li>📄 Apply to jobs with resume upload</li>
+            <li>💾 Save jobs for later</li>
+            <li>📊 Track applied jobs and application status</li>
+            <li>🧑‍💼 Recruiter dashboard to post and manage jobs</li>
+            <li>🔐 Authentication using JWT</li>
+          </ul>
+
         </div>
+
+        {/* TECH STACK */}
+        <div className="bg-white p-8 rounded-xl shadow-lg border mt-6 hover:shadow-xl transition">
+
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            🛠️ Tech Stack
+          </h2>
+
+          <ul className="list-disc pl-5 text-gray-600 space-y-2">
+            <li><strong>Frontend:</strong> React.js, Tailwind CSS</li>
+            <li><strong>Backend:</strong> Node.js, Express.js</li>
+            <li><strong>Database:</strong> MongoDB</li>
+            <li><strong>State Management:</strong> Redux Toolkit</li>
+          </ul>
+
+        </div>
+
+        {/* YOUR INFO */}
+        <div className="bg-white p-8 rounded-xl shadow-lg border mt-6 hover:shadow-xl transition">
+
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            👨‍💻 Developer
+          </h2>
+
+          <p className="text-gray-600">
+            Developed by <strong>Pavan Adhitya Bollam</strong>
+          </p>
+
+          <p className="text-gray-600 mt-2">
+            Passionate about full-stack development and currently exploring DevOps technologies.
+          </p>
+
+        </div>
+
       </div>
     </div>
   )
 }
 
-export default Creator
+export default Creator;

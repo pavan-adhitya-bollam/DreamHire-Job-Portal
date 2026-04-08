@@ -9,7 +9,7 @@ import {
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
+import api from "@/utils/axios";
 import { toast } from "sonner";
 import { USER_API_ENDPOINT } from "@/utils/data";
 import { setUser } from "@/redux/authSlice";
@@ -24,16 +24,17 @@ const EditProfileModal = ({ open, setOpen }) => {
     email: user?.email,
     phoneNumber: user?.phoneNumber,
     bio: user?.profile?.bio,
-    skills: user?.profile?.skills?.map((skill) => skill),
-    file: user?.profile?.resume,
+    skills: user?.profile?.skills?.map((skill) => skill).join(', ') || '',
+    file: user?.profile?.profilePhoto,
   });
   const dispatch = useDispatch();
 
   const changeEventHandler = (e) => {
-    setInput({ ...input, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setInput(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = async (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("fullname", input.fullname);
@@ -48,20 +49,13 @@ const EditProfileModal = ({ open, setOpen }) => {
 
     try {
       setLoading(true);
-      const res = await axios.post(
-        `${USER_API_ENDPOINT}/profile/update`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          withCredentials: true,
-        }
-      );
+      const res = await api.post(`/user/profile/update`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       if (res.data.success) {
-        // dispatch(setUser(res.data.user));
-        dispatch(setUser({ ...res.data.user, skills: input.skills }));
+        dispatch(setUser(res.data.user));
         toast.success(res.data.message);
+        console.log("Profile updated successfully:", res.data.user);
       }
     } catch (error) {
       console.log(error);
@@ -81,16 +75,18 @@ const EditProfileModal = ({ open, setOpen }) => {
 
   return (
     <div>
-      <Dialog open={open}>
+      {console.log("EditProfileModal rendering, open:", open)}
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
-          className="sm:max-w-[500px]"
+          className="sm:max-w-[500px] z-50"
           onInteractOutside={() => setOpen(false)}
+          description="Edit your profile information and upload profile photo"
         >
           <DialogHeader>
             <DialogTitle>Edit Profile</DialogTitle>
           </DialogHeader>
           {/* Form for editing profile */}
-          <form onSubmit={handleFileChange}>
+          <form onSubmit={handleFormSubmit}>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right">
@@ -100,7 +96,7 @@ const EditProfileModal = ({ open, setOpen }) => {
                   type="text"
                   id="name"
                   value={input.fullname}
-                  name="name"
+                  name="fullname"
                   onChange={changeEventHandler}
                   className="col-span-3 border border-gray-300 rounded-md p-2"
                 />
@@ -136,7 +132,7 @@ const EditProfileModal = ({ open, setOpen }) => {
                   Bio
                 </Label>
                 <input
-                  type="bio"
+                  type="text"
                   id="bio"
                   value={input.bio}
                   name="bio"
@@ -152,21 +148,43 @@ const EditProfileModal = ({ open, setOpen }) => {
                 <input
                   id="skills"
                   name="skills"
-                  value={input.skills}
+                  value={Array.isArray(input.skills) ? input.skills.join(', ') : input.skills}
                   onChange={changeEventHandler}
                   className="col-span-3 border border-gray-300 rounded-md p-2"
                 />
               </div>
-              {/* Resume file upload */}
+              {/* Current profile photo preview */}
+              {user?.profile?.profilePhoto && (
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label className="text-right">Current Photo</Label>
+                  <div className="col-span-3 flex items-center gap-3">
+                    <img 
+                      src={
+                        user.profile.profilePhoto.startsWith('http') 
+                          ? user.profile.profilePhoto 
+                          : `http://localhost:5001${user.profile.profilePhoto}`
+                      } 
+                      alt="Current profile" 
+                      className="h-16 w-16 rounded-full object-cover"
+                      onError={(e) => {
+                        e.target.src = "https://via.placeholder.com/150";
+                      }}
+                    />
+                    <span className="text-sm text-gray-600">Current profile photo</span>
+                  </div>
+                </div>
+              )}
+              
+              {/* Profile photo upload */}
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="file" className="text-right">
-                  Resume
+                  {user?.profile?.profilePhoto ? "Update Photo" : "Profile Photo"}
                 </Label>
                 <input
                   type="file"
                   id="file"
                   name="file"
-                  accept="application/pdf"
+                  accept="image/*"
                   onChange={FileChangehandler}
                   className="col-span-3 border border-gray-300 rounded-md p-2"
                 />
