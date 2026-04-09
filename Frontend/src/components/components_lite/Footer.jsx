@@ -12,7 +12,7 @@ const Footer = () => {
           backgroundColor: "#f1f1f1",
         }}
       >
-        <p>© 2026  Devops Project. All rights reserved.</p>
+        <p>© 2026  MERN Stack Project. All rights reserved.</p>
         <p>
           Powered by <a href="https://github.com/pavanadhityabollam">Pavan Adhitya Bollam</a>
         </p>
